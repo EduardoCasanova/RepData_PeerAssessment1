@@ -4,8 +4,6 @@
 # set global options
 knitr::opts_chunk$set(echo=TRUE)
 knitr::opts_chunk$set(comment=NA)
-library("lattice")
-cache=TRUE
 ```
 #Reproducible Research
 
@@ -25,11 +23,11 @@ This assignment makes use of data from a personal activity monitoring device. Th
     
 The variables included in this dataset are:
 
-- steps: Number of steps taking in a 5-minute interval (missing values are coded as NA)
+- *steps*: Number of steps taking in a 5-minute interval (missing values are coded as NA)
 
-- date: The date on which the measurement was taken in YYYY-MM-DD format
+- *date*: The date on which the measurement was taken in YYYY-MM-DD format
 
-- interval: Identifier for the 5-minute interval in which measurement was taken
+- *interval*: Identifier for the 5-minute interval in which measurement was taken
 
 
 ```r
@@ -68,12 +66,8 @@ steps_day <- tapply(dat$steps, dat$date, sum, na.rm=T )
 barplot(steps_day,las=2, cex.names =  0.8, main = "total number of steps taken each day ")
 ```
 
-![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2.png) 
+![plot of chunk fig1](figure/fig1.png) 
 
-```r
-#days <- names(steps_day)
-#stripplot(days~steps_day, type="h",xlab = "steps", ylab = "day")
-```
 ####Mean:
 
 ```r
@@ -104,7 +98,7 @@ daily <- tapply(dat$steps, dat$interval, mean, na.rm=T )
 plot(names(daily), daily, type="l", ylab = "average number of steps", xlab = "interval", main = "Average daily activity pattern")
 ```
 
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5.png) 
+![plot of chunk fig2](figure/fig2.png) 
 
 ####Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
@@ -161,7 +155,7 @@ steps_day_na <- tapply(datna$steps, datna$date, sum)
 barplot(steps_day_na,las=2, cex.names =  0.8, main = "total number of steps taken each day with NA replaced")
 ```
 
-![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9.png) 
+![plot of chunk fig3](figure/fig3.png) 
 
 ####Mean:
 
@@ -188,8 +182,20 @@ median(steps_day_na)
 
 
 ```r
+#new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+#as.POSIXlt()$wday == 0 -> sunday
+#as.POSIXlt()$wday == 6 -> saturday
 day <- as.factor(ifelse((as.POSIXlt(datna[,2])$wday)==0|(as.POSIXlt(datna[,2])$wday)==6,"weekend","weekday"))
 datna <- cbind (datna, day)
 ```
 
+####Average number of steps:
 
+```r
+daily2 <- tapply(datna$steps, list(datna$interval, datna$day), mean )
+par(mfrow = c(2,1) )
+plot(row.names(daily2), daily2[,1], type="l", ylab = "average number of steps", xlab = "interval", main = "weekday")
+plot(row.names(daily2), daily2[,2], type="l", ylab = "average number of steps", xlab = "interval", main = "weekend")
+```
+
+![plot of chunk fig4](figure/fig4.png) 
