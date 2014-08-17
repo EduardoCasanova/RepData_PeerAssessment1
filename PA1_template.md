@@ -1,5 +1,6 @@
 ####Global options:
-```{r setup}
+
+```r
 # set global options
 knitr::opts_chunk$set(echo=TRUE)
 knitr::opts_chunk$set(comment=NA)
@@ -30,31 +31,66 @@ The variables included in this dataset are:
 
 - interval: Identifier for the 5-minute interval in which measurement was taken
 
-```{r load, cache=TRUE}
+
+```r
 dat = read.csv("activity.csv")
 ```
 
-```{r}
+
+```r
 head(dat,3)
+```
+
+```
+  steps       date interval
+1    NA 2012-10-01        0
+2    NA 2012-10-01        5
+3    NA 2012-10-01       10
+```
+
+```r
 str(dat)
+```
+
+```
+'data.frame':	17568 obs. of  3 variables:
+ $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+ $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
 
 ### What is mean total number of steps taken per day?
 
-```{r fig.width=12}
+
+```r
 steps_day <- tapply(dat$steps, dat$date, sum, na.rm=T )
 barplot(steps_day,las=2, cex.names =  0.8, main = "total number of steps taken each day ")
+```
+
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2.png) 
+
+```r
 #days <- names(steps_day)
 #stripplot(days~steps_day, type="h",xlab = "steps", ylab = "day")
 ```
 ####Mean:
-```{r}
+
+```r
 mean(steps_day)
 ```
+
+```
+[1] 9354
+```
 ####Median:
-```{r}
+
+```r
 median(steps_day)
+```
+
+```
+[1] 10395
 ```
 
 
@@ -62,29 +98,54 @@ median(steps_day)
 
 ### What is the average daily activity pattern?
 
-```{r fig.width=12}
+
+```r
 daily <- tapply(dat$steps, dat$interval, mean, na.rm=T )
 plot(names(daily), daily, type="l", ylab = "average number of steps", xlab = "interval", main = "Average daily activity pattern")
 ```
 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5.png) 
+
 ####Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r}
+
+```r
 which.max(daily)
+```
+
+```
+835 
+104 
+```
+
+```r
 max(daily)
+```
+
+```
+[1] 206.2
 ```
 Note: This means interval 835 in the position 104, with a value of 206.1698
 
 ### Imputing missing values
 
 ####Total number of missing values in the dataset:
-```{r}
+
+```r
 sum(is.na(dat))
+```
+
+```
+[1] 2304
+```
+
+```r
 #the NA are only in the first column
 ```
 
 ####Replace the missing values with the mean for that 5-minute interval:
-```{r}
+
+```r
 datna <- dat
 for (i in 1:length(datna[,1])){
   if(is.na(datna[i,1])){
@@ -94,25 +155,39 @@ for (i in 1:length(datna[,1])){
 ```
 
 ####Total number of steps taken each day:
-```{r fig.width=12}
+
+```r
 steps_day_na <- tapply(datna$steps, datna$date, sum)
 barplot(steps_day_na,las=2, cex.names =  0.8, main = "total number of steps taken each day with NA replaced")
 ```
 
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9.png) 
+
 ####Mean:
-```{r}
+
+```r
 mean(steps_day_na)
 ```
+
+```
+[1] 10766
+```
 ####Median:
-```{r}
+
+```r
 median(steps_day_na)
 ```
 
-####This values are higher *(`r round((mean(steps_day_na)-mean(steps_day))/mean(steps_day),2)` for the mean, and `r round((median(steps_day_na)-median(steps_day))/median(steps_day),2)` for the median)* from those before replacing the NA.
+```
+[1] 10762
+```
+
+####This values are higher *(0.15 for the mean, and 0.04 for the median)* from those before replacing the NA.
 
 ### Are there differences in activity patterns between weekdays and weekends?
 
-```{r}
+
+```r
 day <- as.factor(ifelse((as.POSIXlt(datna[,2])$wday)==0|(as.POSIXlt(datna[,2])$wday)==6,"weekend","weekday"))
 datna <- cbind (datna, day)
 ```
